@@ -2,7 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import 'bet.dart';
 import 'playerList.dart';
@@ -16,13 +20,35 @@ class OddEven extends StatefulWidget {
   State<OddEven> createState() => OddEvenState();
 }
 
+class Player {
+  var username;
+  var points;
+
+  Player(this.username, this.points);
+
+  factory Player.fromJson(Map<String, dynamic> json) {
+    return switch (json) {
+      {
+        'username': String username,
+        'pontos': int point,
+      } =>
+        Player(
+          username,
+          point,
+        ),
+      _ => throw const FormatException('Failed to load Player.'),
+    };
+  }
+}
+
 class OddEvenState extends State<OddEven> {
   // 0 -> register
   // 1 -> player board
   // 2 -> game
   // 3 -> game result
-  var currScreen = 0;
-  var playerName = "";
+  int currScreen = 0;
+  String playerName = '';
+  List<Player> playerList = [];
 
   void changeScreen(int newScreen) {
     setState(() {
@@ -36,9 +62,19 @@ class OddEvenState extends State<OddEven> {
     });
   }
 
-  void registerPlayer(String name) {
-    playerName = name;
-    changeScreen(1);
+  Future<void> registerPlayer(String name) async {
+    var url = Uri.https('par-impar.glitch.me', 'novo');
+    var response = await http.post(url,
+        body: jsonEncode(<String, String>{'username': playerName}));
+
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      print(playerList);
+      playerName = name;
+
+      changeScreen(1);
+    } else {
+      throw const HttpException('Failed to register player');
+    }
   }
 
   Widget showScreen() {
