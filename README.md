@@ -1,4 +1,4 @@
-# Rock paper scisors
+# Even or Odd
 
 ## Setup
 
