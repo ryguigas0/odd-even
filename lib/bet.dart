@@ -62,7 +62,7 @@ class BetState extends State<Bet> {
                   groupValue: oddEven,
                   onChanged: (int? value) {
                     setState(() {
-                      oddEven = 0;
+                      oddEven = 1;
                     });
                   }),
               const Text('Even'),
@@ -71,14 +71,14 @@ class BetState extends State<Bet> {
                   groupValue: oddEven,
                   onChanged: (int? value) {
                     setState(() {
-                      oddEven = 1;
+                      oddEven = 2;
                     });
                   })
             ],
           ),
           ElevatedButton(
               child: const Text('Choose adversary'),
-              onPressed: () => callback(2))
+              onPressed: () => callback(betValue, oddEven, num))
         ],
       ),
     );

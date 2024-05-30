@@ -65,9 +65,16 @@ class OddEvenState extends State<OddEven> {
   Future<void> registerPlayer(String name) async {
     var url = Uri.https('par-impar.glitch.me', 'novo');
     var response = await http.post(url,
-        body: jsonEncode(<String, String>{'username': playerName}));
+        body: jsonEncode({'username': playerName}));
 
     if (response.statusCode == 200 || response.statusCode == 204) {
+      // List usuariosJson =
+      //     ((jsonDecode(response.body) as Map<String, dynamic>)['usuarios']);
+
+      // playerList = usuariosJson
+      //     .map((playerJson) => Player.fromJson(playerJson))
+      //     .toList();
+
       print(playerList);
       playerName = name;
 
@@ -77,10 +84,27 @@ class OddEvenState extends State<OddEven> {
     }
   }
 
+  Future<void> postBet(int betValue, int oddEven, int number) async {
+    var url = Uri.https('par-impar.glitch.me', 'aposta');
+    var response = await http.post(url,
+        body: jsonEncode({
+          'username': playerName,
+          'valor': betValue,
+          'parimpar': oddEven, // 2 -> even, 1 -> odd
+          'numero': number
+        }));
+
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      changeScreen(2);
+    } else {
+      throw const HttpException('Failed to register bet');
+    }
+  }
+
   Widget showScreen() {
     switch (currScreen) {
       case 1:
-        return Bet(changeScreen, playerName);
+        return Bet(postBet, playerName);
       case 2:
         return PlayerList(changeScreen);
       case 3:
