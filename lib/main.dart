@@ -49,7 +49,9 @@ class OddEvenState extends State<OddEven> {
   // 3 -> game result
   int currScreen = 0;
   String playerName = '';
+  String challengedPlayerName = '';
   List<Player> playerList = [];
+  String currBetResult = '';
 
   void changeScreen(int newScreen) {
     setState(() {
@@ -105,14 +107,44 @@ class OddEvenState extends State<OddEven> {
     }
   }
 
+  Future<void> challengePlayer(String challengedName) async {
+    challengedPlayerName = challengedName;
+
+    var url = Uri.https(
+        'par-impar.glitch.me', 'jogar/' + challengedName + '/' + playerName);
+    var response = await http.get(url);
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      var json = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (json.containsKey('msg')) {
+        currBetResult = "Draw! No one wins points...";
+      } else {
+        var winner = json['vencedor'];
+        var loser = json['perdedor'];
+        if (winner['username'] == playerName) {
+          currBetResult =
+              'You win! You earned ${loser['valor']} points!';
+        } else {
+          currBetResult =
+              'You lose! You lost ${winner['valor']} points!';
+        }
+      }
+
+      changeScreen(3);
+    } else {
+      throw const HttpException('Failed to register bet');
+    }
+  }
+
   Widget showScreen() {
     switch (currScreen) {
       case 1:
         return Bet(postBet, playerName);
       case 2:
-        return PlayerList(changeScreen, playerList, playerName);
+        return PlayerList(challengePlayer, playerList, playerName);
       case 3:
-        return Result(changeScreen);
+        return Result(
+            changeScreen, challengedPlayerName, playerName, currBetResult);
       case 4:
         return BetResult(changeScreen);
       default:

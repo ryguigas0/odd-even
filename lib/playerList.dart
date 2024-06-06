@@ -10,7 +10,6 @@ class PlayerList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(playerList);
     return Scaffold(
         appBar: AppBar(
           title: Text('Player list'),
@@ -25,13 +24,11 @@ class PlayerList extends StatelessWidget {
                           Text(player.username),
                           ElevatedButton(
                               child: const Text('Bet against'),
-                              onPressed: () => callback(3)),
+                              onPressed: () => callback(player.username)),
                         ],
                       ))
                   .toList(),
             ),
-            ElevatedButton(
-                child: const Text('Results'), onPressed: () => callback(3)),
           ],
         ));
   }
