@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:even_odd/betResult.dart';
+import 'package:even_odd/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -52,6 +52,7 @@ class OddEvenState extends State<OddEven> {
   String challengedPlayerName = '';
   List<Player> playerList = [];
   String currBetResult = '';
+  int currPlayerPoints = 0;
 
   void changeScreen(int newScreen) {
     setState(() {
@@ -122,11 +123,9 @@ class OddEvenState extends State<OddEven> {
         var winner = json['vencedor'];
         var loser = json['perdedor'];
         if (winner['username'] == playerName) {
-          currBetResult =
-              'You win! You earned ${loser['valor']} points!';
+          currBetResult = 'You win! You earned ${loser['valor']} points!';
         } else {
-          currBetResult =
-              'You lose! You lost ${winner['valor']} points!';
+          currBetResult = 'You lose! You lost ${winner['valor']} points!';
         }
       }
 
@@ -136,6 +135,24 @@ class OddEvenState extends State<OddEven> {
     }
   }
 
+  Future<void> getPlayerProfile() async {
+    var url = Uri.https('par-impar.glitch.me', 'pontos/' + playerName);
+    var response = await http.get(url);
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      var json = jsonDecode(response.body) as Map<String, dynamic>;
+
+      currPlayerPoints = json['pontos'];
+
+      changeScreen(4);
+    } else {
+      throw const HttpException('Failed to get bet');
+    }
+  }
+
+  void anotherBet() {
+    changeScreen(1);
+  }
+
   Widget showScreen() {
     switch (currScreen) {
       case 1:
@@ -143,10 +160,10 @@ class OddEvenState extends State<OddEven> {
       case 2:
         return PlayerList(challengePlayer, playerList, playerName);
       case 3:
-        return Result(
-            changeScreen, challengedPlayerName, playerName, currBetResult);
+        return Result(anotherBet, getPlayerProfile, challengedPlayerName,
+            playerName, currBetResult);
       case 4:
-        return BetResult(changeScreen);
+        return Profile(changeScreen, playerName, currPlayerPoints);
       default:
         return Register(registerPlayer);
     }

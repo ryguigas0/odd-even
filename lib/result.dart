@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 // As apostas são comparadas e o resultado exibido
 class Result extends StatelessWidget {
   // funcao para trocar de tela
-  Function callback;
+  Function anotherBetCallback;
+  Function playerProfileCallback;
   String challenger;
   String challenged;
   String currBetResult;
 
-  Result(this.callback, this.challenged, this.challenger, this.currBetResult);
+  Result(this.anotherBetCallback, this.playerProfileCallback, this.challenged,
+      this.challenger, this.currBetResult);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,12 @@ class Result extends StatelessWidget {
       body: Column(
         children: [
           Text(currBetResult),
-          TextButton(child: Text('New bet'), onPressed: () => callback(1))
+          ElevatedButton(
+              child: const Text('Make another bet'),
+              onPressed: () => anotherBetCallback()),
+          ElevatedButton(
+              child: const Text('Profile'),
+              onPressed: () => playerProfileCallback())
         ],
       ),
     );
