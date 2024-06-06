@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:even_odd/betResult.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -64,18 +65,20 @@ class OddEvenState extends State<OddEven> {
 
   Future<void> registerPlayer(String name) async {
     var url = Uri.https('par-impar.glitch.me', 'novo');
-    var response = await http.post(url,
-        body: jsonEncode({'username': playerName}));
+    var response = await http.post(
+      url,
+      headers: {'Content-type': 'application/json'},
+      body: jsonEncode({'username': name}),
+    );
 
     if (response.statusCode == 200 || response.statusCode == 204) {
-      // List usuariosJson =
-      //     ((jsonDecode(response.body) as Map<String, dynamic>)['usuarios']);
+      List usuariosJson =
+          ((jsonDecode(response.body) as Map<String, dynamic>)['usuarios']);
 
-      // playerList = usuariosJson
-      //     .map((playerJson) => Player.fromJson(playerJson))
-      //     .toList();
+      playerList = usuariosJson
+          .map((playerJson) => Player.fromJson(playerJson))
+          .toList();
 
-      print(playerList);
       playerName = name;
 
       changeScreen(1);
@@ -87,6 +90,7 @@ class OddEvenState extends State<OddEven> {
   Future<void> postBet(int betValue, int oddEven, int number) async {
     var url = Uri.https('par-impar.glitch.me', 'aposta');
     var response = await http.post(url,
+        headers: {'Content-type': 'application/json'},
         body: jsonEncode({
           'username': playerName,
           'valor': betValue,
@@ -106,9 +110,11 @@ class OddEvenState extends State<OddEven> {
       case 1:
         return Bet(postBet, playerName);
       case 2:
-        return PlayerList(changeScreen);
+        return PlayerList(changeScreen, playerList, playerName);
       case 3:
         return Result(changeScreen);
+      case 4:
+        return BetResult(changeScreen);
       default:
         return Register(registerPlayer);
     }

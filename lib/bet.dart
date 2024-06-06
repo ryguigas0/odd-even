@@ -16,7 +16,7 @@ class BetState extends State<Bet> {
   String playerName;
   int num = 1;
   int betValue = 0;
-  int oddEven = 0;
+  int oddEven = 1;
 
   BetState(this.callback, this.playerName);
 
@@ -58,7 +58,7 @@ class BetState extends State<Bet> {
             children: [
               const Text('Odd'),
               Radio(
-                  value: 0,
+                  value: 1,
                   groupValue: oddEven,
                   onChanged: (int? value) {
                     setState(() {
@@ -67,7 +67,7 @@ class BetState extends State<Bet> {
                   }),
               const Text('Even'),
               Radio(
-                  value: 1,
+                  value: 2,
                   groupValue: oddEven,
                   onChanged: (int? value) {
                     setState(() {
